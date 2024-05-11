@@ -1,4 +1,5 @@
 import { dummyNewsData } from "@/dummy_data";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 const NewsDetail = ({ params }: any) => {
@@ -11,11 +12,13 @@ const NewsDetail = ({ params }: any) => {
 
   return (
     <article className="m-3">
-      <img
-        src={`/images/news/${currentArticle?.imageName}`}
-        alt={currentArticle?.title}
-        className="w-full h-48 object-cover mb-2"
-      />
+      <Link href={`/news/${currentArticle?.slug}/image`}>
+        <img
+          src={`/images/news/${currentArticle?.imageName}`}
+          alt={currentArticle?.title}
+          className="w-full h-48 object-cover mb-2"
+        />
+      </Link>
       <time className="text-gray-400">
         Published on: {currentArticle?.date}
       </time>
