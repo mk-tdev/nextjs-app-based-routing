@@ -4,8 +4,6 @@ const NewsList = ({ dummyNewsData }: any) => {
   return (
     <ul className="space-y-4 my-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {dummyNewsData.map((article: any) => {
-        console.log(article);
-
         return (
           <li
             key={article.slug}

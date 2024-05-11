@@ -1,8 +1,8 @@
 import NewsList from "@/components/news-list";
-import { getLatestNews } from "@/lib/news";
+import { getLatestNews } from "@/lib/news-data";
 
-const LatestPage = () => {
-  const latestNews = getLatestNews();
+const LatestPage = async () => {
+  const latestNews = await getLatestNews();
 
   return (
     <section className="my-5 ">

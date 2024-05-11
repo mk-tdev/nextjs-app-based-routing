@@ -1,4 +1,4 @@
-import { getAllNews } from "@/lib/news";
+import { getAllNews } from "@/lib/news-data";
 
 export const GET = async (request: Request) => {
   try {

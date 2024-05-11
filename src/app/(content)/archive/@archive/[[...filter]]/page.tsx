@@ -5,79 +5,91 @@ import {
   getAvailableNewsYears,
   getNewsForYearAndMonth,
   getAvailableNewsMonths,
-} from "@/lib/news";
+} from "@/lib/news-data";
+import { Suspense } from "react";
+import LoadingSingleSkeleton from "@/components/single-skeleton-loading";
 
-const YearWise = ({ params }: any) => {
-  const { filter } = params;
+const FilterHeader = async ({ year, month }: any) => {
+  const availableData = await getAvailableNewsYears();
 
-  const selectedYear = filter?.[0];
-  const selectedMonth = filter?.[1];
-  let links = getAvailableNewsYears();
-
-  let news: any = [];
-  let newsNotFoundMsg = "";
-
-  if (selectedYear && !selectedMonth) {
-    news = getNewsForYear(selectedYear);
-    links = getAvailableNewsMonths(selectedYear);
-    newsNotFoundMsg = "No news found for the selected year and month";
-  } else if (selectedYear && selectedMonth) {
-    news = getNewsForYearAndMonth(selectedYear, selectedMonth);
+  let links = availableData;
+  if (year && !month) {
+    links = getAvailableNewsMonths(year);
+  } else if (year && month) {
     links = [];
-    newsNotFoundMsg = "No news found for the selected year and month";
-  } else {
-    newsNotFoundMsg = "Please select a year or year and month to view news";
   }
 
-  if (selectedYear && !getAvailableNewsYears().includes(+selectedYear)) {
+  if (year && !availableData.includes(year)) {
     throw new Error("Invalid");
   }
 
-  if (
-    selectedMonth &&
-    !getAvailableNewsMonths(selectedYear).includes(+selectedMonth)
-  ) {
+  if (month && !getAvailableNewsMonths(year).includes(month)) {
     throw new Error("Invalid");
   }
 
   return (
+    <header>
+      <nav>
+        <ul className="flex gap-5 items-center ">
+          {links.map((link: any) => {
+            const href = year ? `/archive/${year}/${link}` : `/archive/${link}`;
+
+            return (
+              <li key={link}>
+                <Link href={href}>{year ? "Month " + link : link}</Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+    </header>
+  );
+};
+
+const FilteredNews = async ({ year, month }: any): Promise<any> => {
+  let news: any = [];
+  let newsNotFoundMsg = "";
+
+  if (year && !month) {
+    news = await getNewsForYear(year);
+    newsNotFoundMsg = "No news found for the selected year and month";
+  } else if (year && month) {
+    news = await getNewsForYearAndMonth(year, month);
+    newsNotFoundMsg = "No news found for the selected year and month";
+  }
+  newsNotFoundMsg = "Please select a year or year and month to view news";
+
+  return (
     <>
-      <header>
-        <nav>
-          <ul className="flex gap-5 items-center ">
-            {links.map((link: any) => {
-              const href = selectedYear
-                ? `/archive/${selectedYear}/${link}`
-                : `/archive/${link}`;
-
-              return (
-                <li key={link}>
-                  <Link href={href}>
-                    {selectedYear ? "Month " + link : link}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-      </header>
-
       {news.length === 0 && (
         <section className="my-5">
-          <p>
-            {newsNotFoundMsg}
-            {selectedMonth ? ` and month` : ""}.
-          </p>
+          <p>{newsNotFoundMsg}</p>
         </section>
       )}
 
       {news.length > 0 && (
         <section className="mt-5">
-          <h1>News from {selectedYear}</h1>
-
           <NewsList dummyNewsData={news} />
         </section>
       )}
+    </>
+  );
+};
+
+const YearWise = async ({ params }: any) => {
+  const { filter } = params;
+
+  const selectedYear = filter?.[0];
+  const selectedMonth = filter?.[1];
+
+  return (
+    <>
+      <Suspense fallback={<p>Loading years and months!</p>}>
+        <FilterHeader year={selectedYear} month={selectedMonth} />
+      </Suspense>
+      <Suspense fallback={<LoadingSingleSkeleton />}>
+        <FilteredNews year={selectedYear} month={selectedMonth} />
+      </Suspense>
     </>
   );
 };
