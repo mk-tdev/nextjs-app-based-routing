@@ -7,3 +7,7 @@ all components are server side by default
 client side component
 route groups
 middlewares
+
+=====================
+
+data fetching

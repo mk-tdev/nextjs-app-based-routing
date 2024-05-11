@@ -1,13 +1,20 @@
 import NewsList from "@/components/news-list";
-import { dummyNewsData } from "@/dummy_data";
-import Link from "next/link";
 
-const News = () => {
+const News = async () => {
+  const response = await fetch("http://localhost:8080/news");
+
+  if (!response.ok) {
+    throw new Error(`HTTP error ${response.status}`);
+  }
+
+  const data = await response.json();
+  let newsData: any = data || [];
+
   return (
     <div className="m-3">
-      <h1 className="mb-3">News</h1>
+      <h1 className="mb-3 ">News</h1>
 
-      <NewsList dummyNewsData={dummyNewsData} />
+      <NewsList dummyNewsData={newsData} />
     </div>
   );
 };
